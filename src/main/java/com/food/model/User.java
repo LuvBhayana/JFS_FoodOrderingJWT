@@ -28,6 +28,7 @@ public class User {
     private List<Order> orders = new ArrayList<>();
     @ElementCollection
     private List<RestaurantDto>favorites = new ArrayList<>();
+//    private List<Address> addresses = new ArrayList<>();
     private List<Address> addresses = new ArrayList<>();
 
 }
