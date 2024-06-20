@@ -29,6 +29,7 @@ public class User {
     @ElementCollection
     private List<RestaurantDto>favorites = new ArrayList<>();
 //    private List<Address> addresses = new ArrayList<>();
-    private List<Address> addresses = new ArrayList<>();
+
+
 
 }
