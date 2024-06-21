@@ -24,12 +24,13 @@ public class User {
     private USER_ROLE role;
 
     @JsonIgnore
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "customer")
     private List<Order> orders = new ArrayList<>();
     @ElementCollection
     private List<RestaurantDto>favorites = new ArrayList<>();
-//    private List<Address> addresses = new ArrayList<>();
-
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    //user gaya toh orphan removal se address bhi delete
+    private List<Address> addresses = new ArrayList<>();
 
 
 }
