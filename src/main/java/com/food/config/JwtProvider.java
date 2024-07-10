@@ -13,17 +13,12 @@ import java.util.*;
 
 @Service
 public class JwtProvider {
-    private SecretKey key;
+    private final SecretKey secretKey;
 
     public JwtProvider() {
         try {
             // Generate a secure key
-            key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-            // Alternatively, if you have a securely stored key, you can retrieve and decode it:
-            // String base64Key = "your-base64-encoded-secret-key";
-            // key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
-
+            secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to initialize JwtProvider: " + e.getMessage(), e);
         }
@@ -35,18 +30,24 @@ public class JwtProvider {
 
         String jwt = Jwts.builder()
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 86400000))
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day expiration
                 .claim("email", auth.getName())
                 .claim("authorities", roles)
-                .signWith(key)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
         return jwt;
     }
 
     public String getEmailFromJwtToken(String jwt) {
-        jwt = jwt.substring(7);
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-        return String.valueOf(claims.get("email"));
+        if (jwt.startsWith("Bearer ")) {
+            jwt = jwt.substring(7);
+        }
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(jwt)
+                .getBody();
+        return claims.get("email", String.class);
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
